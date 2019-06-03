@@ -1,4 +1,4 @@
-import { isArr } from './types'
+import { isArr } from '@uform/types'
 
 export const toArr = val => (isArr(val) ? val : val ? [val] : [])
 
