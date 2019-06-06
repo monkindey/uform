@@ -1,5 +1,6 @@
 import * as React from 'react'
 import pascalCase from 'pascal-case'
+import { IFormOptions } from '@uform/types'
 import { isFn, isNotEmptyStr, lowercase, each, compose } from '../utils'
 
 export interface FormProps {
@@ -116,6 +117,6 @@ export const getFormField = (name: string) => {
 
 export const getFieldRendere: React.FunctionComponent | React.ComponentClass = () => FIELD_RENDERER
 
-export const OriginForm = React.forwardRef((props, ref) =>
+export const OriginForm = React.forwardRef((props: IFormOptions, ref) =>
   React.createElement(FORM_COMPONENT, { ...props, ref })
 )
