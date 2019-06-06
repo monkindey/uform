@@ -1,10 +1,12 @@
-import { reduce, isFn } from '@uform/utils'
+import { reduce, isFn, isStr } from '@uform/utils'
 
 export * from '@uform/utils'
 
 export const isNum = (value: string | number): boolean => typeof value === 'number'
 
-export const compose = (payload, args: [], revert: boolean) =>
+export const isNotEmptyStr = (str: string): boolean => !!(isStr(str) && str)
+
+export const compose = (payload: any, args: any[], revert: boolean) =>
   reduce(
     args,
     (buf, fn: any) => {

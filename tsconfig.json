@@ -1,6 +1,7 @@
 {
   "preset": "ts-jest",
   "compilerOptions": {
+    "esModuleInterop": true,
     "jsx": "react",
     "module": "commonjs",
     "target": "es5",
