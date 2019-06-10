@@ -117,7 +117,7 @@ export const getFormField = (name: string) => {
   return FORM_FIELDS[name]
 }
 
-export const getFieldRenderer: React.ComponentType = () => FIELD_RENDERER
+export const getFieldRenderer = () => FIELD_RENDERER
 
 export const OriginForm = React.forwardRef((props: SchemaFormProps, ref: React.Ref<any>) =>
   React.createElement(FORM_COMPONENT, { ...props, ref })
