@@ -3,7 +3,8 @@ import pascalCase from 'pascal-case'
 import { IFormOptions } from '@uform/types'
 import { isFn, isNotEmptyStr, lowercase, each, compose } from '../utils'
 
-export interface FormProps {
+// 最原生的 Form，用到了 DOM 的 form 标签
+export interface NativeFormProps {
   component: string
   formRef?: React.Ref<any>
 }
@@ -32,7 +33,7 @@ export const initialContainer = () => {
   FORM_FIELDS = {}
   FIELD_PROPS_TRANSFORMERS = {}
   FIELD_RENDERER = undefined
-  FORM_COMPONENT = class extends React.Component<FormProps> {
+  FORM_COMPONENT = class extends React.Component<NativeFormProps> {
     static defaultProps = {
       component: 'form'
     }
@@ -98,7 +99,7 @@ export const registerFormWrapper = (...wrappers: any[]) => {
   }, FORM_COMPONENT)
 }
 
-export const registerFieldRenderer = (renderer: React.FunctionComponent | React.ComponentClass) => {
+export const registerFieldRenderer = (renderer: React.ComponentType) => {
   FIELD_RENDERER = renderer
 }
 
@@ -115,7 +116,7 @@ export const getFormField = (name: string) => {
   return FORM_FIELDS[name]
 }
 
-export const getFieldRenderer: React.FunctionComponent | React.ComponentClass = () => FIELD_RENDERER
+export const getFieldRenderer: React.ComponentType = () => FIELD_RENDERER
 
 export const OriginForm = React.forwardRef((props: IFormOptions, ref) =>
   React.createElement(FORM_COMPONENT, { ...props, ref })
