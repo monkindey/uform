@@ -8,6 +8,11 @@ export interface IFormPayload {
   formState: IFormState
 }
 
+export interface IFieldPayload {
+  fieldState: IFieldState
+  formState: IFormState
+}
+
 export interface IFieldError {
   name: string
   errors: string[]
@@ -29,18 +34,19 @@ export interface ISubscribers {
 
 export interface IFormOptions {
   className?: string
-  children: React.ReactNode
+  children?: React.ReactNode
   editable: boolean | ((nam: string) => boolean)
   effects: IEffects
+  defaultValue?: object
   initialValues?: object
   schema: ISchema | {}
   subscribes: ISubscribers
   onFormChange: (payload: IFormPayload) => void
-  onFieldChange: (fieldState: IFieldState, formState?: IFormState) => void
+  onFieldChange: (payload: IFieldPayload) => void
   onValidateFailed: (fieldErrors: IFieldError[]) => void
   onFormWillInit?: (form: any) => void
   onReset: (payload: IFormPayload) => void
-  onSubmit: (values: any) => Promise<any> | null
+  onSubmit: (values: any) => Promise<any> | void
 }
 
 export interface IFormActions {
