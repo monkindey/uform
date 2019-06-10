@@ -1,7 +1,7 @@
+import { Subject } from 'rxjs/internal/Subject'
 import { Path } from './path'
 import { IFieldState, IField } from './field'
 import { ISchema } from './schema'
-import { Subject } from 'rxjs/internal/Subject'
 import { IEffects } from './effects'
 
 export interface IFormPayload {
@@ -33,8 +33,6 @@ export interface ISubscribers {
 }
 
 export interface IFormOptions {
-  className?: string
-  children?: React.ReactNode
   editable: boolean | ((nam: string) => boolean)
   effects: IEffects
   defaultValue?: object
@@ -49,6 +47,7 @@ export interface IFormOptions {
   onSubmit: (values: any) => Promise<any> | void
 }
 
+// 通过 createActions 或者 createAsyncActions 创建出来的 actions 接口
 export interface IFormActions {
   setFieldState: (
     name: Path | IFormPathMatcher,

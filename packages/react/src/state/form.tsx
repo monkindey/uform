@@ -1,25 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-eva'
-import { createForm } from '@uform/core'
-import { IFormState, IFormOptions, IFormPayload } from '@uform/types'
-import { IBroadcast } from '@uform/utils'
+import { createForm, Form } from '@uform/core'
+import { IFormState } from '@uform/types'
 
 import { createHOC, getSchemaNodeFromPath, isEqual, clone, isEmpty } from '../utils'
 import { StateContext } from '../shared/context'
 import { getFormFieldPropsTransformer } from '../shared/core'
 import { FormBridge } from '../shared/broadcast'
-
-interface StateFormProps extends IFormOptions {
-  broadcast: IBroadcast
-  // TODO 接口定义
-  implementActions: Function
-  dispatch: Function
-  subscription: Function
-  // TODO 不知道这个从哪里来的
-  locale: Object
-  onChange?: (payload: IFormPayload) => void
-  value?: any
-}
+import { StateFormProps } from '../type'
 
 export const StateForm = createHOC((options, Form) => {
   class StateForm extends Component<StateFormProps, IFormState> {
@@ -29,13 +17,12 @@ export const StateForm = createHOC((options, Form) => {
       locale: {}
     }
 
-    timerId: number
-    unmounted: boolean
-    initialized: boolean
-    lastFormValues: IFormState
-    // TODO 要加上 createForm 返回的定义
-    form: any
-    unsubscribe: Function
+    private timerId: number
+    private unmounted: boolean
+    private initialized: boolean
+    private lastFormValues: IFormState
+    private form: Form
+    private unsubscribe: Function
 
     constructor(props) {
       super(props)

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import pascalCase from 'pascal-case'
-import { IFormOptions } from '@uform/types'
+
+import { SchemaFormProps } from '../type'
 import { isFn, isNotEmptyStr, lowercase, each, compose } from '../utils'
 
 // 最原生的 Form，用到了 DOM 的 form 标签
@@ -10,7 +11,7 @@ export interface NativeFormProps {
 }
 
 export interface RegisteredFieldsMap {
-  [name: string]: React.FunctionComponent | React.ComponentClass
+  [name: string]: React.ComponentType
 }
 
 // TODO 下面两个接口能不能合并成一个
@@ -118,6 +119,6 @@ export const getFormField = (name: string) => {
 
 export const getFieldRenderer: React.ComponentType = () => FIELD_RENDERER
 
-export const OriginForm = React.forwardRef((props: IFormOptions, ref) =>
+export const OriginForm = React.forwardRef((props: SchemaFormProps, ref: React.Ref<any>) =>
   React.createElement(FORM_COMPONENT, { ...props, ref })
 )

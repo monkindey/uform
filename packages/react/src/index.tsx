@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { setLocale, setLanguage } from '@uform/validator'
 import { FormPath } from '@uform/core'
-import { IFormActions, IFormOptions } from '@uform/types'
+import { IFormActions } from '@uform/types'
 import { createActions, createAsyncActions } from 'react-eva'
 
 import {
@@ -16,6 +16,7 @@ import { FormField } from './state/field'
 import { caculateSchemaInitialValues } from './utils'
 import { SchemaField, SchemaMarkup } from './decorators/markup'
 import initialize from './initialize'
+import { SchemaFormProps } from './type'
 
 export * from './shared/virtualbox'
 export * from './decorators/connect'
@@ -25,7 +26,7 @@ export * from './shared/array'
 initialize()
 
 export const SchemaForm = SchemaMarkup()(
-  React.forwardRef((props: IFormOptions, ref) => {
+  React.forwardRef((props: SchemaFormProps, ref: React.Ref<any>) => {
     const { children, className, ...others } = props
     return (
       <OriginForm className={`rs-uform ${className || ''}`} {...others} ref={ref}>
