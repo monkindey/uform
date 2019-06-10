@@ -2,9 +2,10 @@ import { IFormOptions, IFormPayload, ISchema, IField } from '@uform/types'
 import { Form } from '@uform/core'
 import { IBroadcast } from '@uform/utils'
 
-export interface FieldProps extends IField {
+export interface FieldProps extends IField, StateFieldProps {
   children?: React.ReactNode
   schema: ISchema
+  getOrderProperties: Function
 }
 
 export interface StateFieldProps {
