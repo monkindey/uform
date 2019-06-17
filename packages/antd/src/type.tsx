@@ -30,7 +30,6 @@ export interface IFormConsumerProps {
 }
 
 export interface IFormProps extends IFormConsumerProps {
-  // 样式
   className: string
   style: object
   layout: string

@@ -4,10 +4,17 @@ import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 import MoveTo from 'moveto'
 import { isFn } from '@uform/utils'
+
 export * from '@uform/utils'
+
+export interface ISelectProps {
+  dataSource: any[]
+  className: string
+}
+
 const WrapSelect = styled(
-  class extends React.Component {
-    render() {
+  class extends React.Component<ISelectProps> {
+    public render() {
       const { dataSource = [], ...others } = this.props
       const children = dataSource.map(item => {
         const { label, value, ...others } = item
@@ -31,18 +38,14 @@ const WrapSelect = styled(
 const Text = styled(props => {
   let value
   if (props.dataSource && props.dataSource.length) {
-    let find = props.dataSource.filter(({ value }) =>
-      Array.isArray(props.value)
-        ? props.value.indexOf(value) > -1
-        : props.value === value
+    const find = props.dataSource.filter(({ value }) =>
+      Array.isArray(props.value) ? props.value.indexOf(value) > -1 : props.value === value
     )
     value = find.map(item => item.label).join(' , ')
   } else {
     value = Array.isArray(props.value)
       ? props.value.join(' ~ ')
-      : String(
-        props.value === undefined || props.value === null ? '' : props.value
-      )
+      : String(props.value === undefined || props.value === null ? '' : props.value)
   }
   return (
     <div className={`${props.className} ${props.size || ''} text-field`}>
@@ -66,36 +69,53 @@ const Text = styled(props => {
   }
 `
 
-export const StateLoading = Target => {
-  return class Select extends React.Component {
-    componentDidMount() {
+export interface IStateLoadingProps {
+  state?: string
+  dataSource: any[]
+}
+
+export const StateLoading = (Target: React.ComponentClass) => {
+  return class Select extends React.Component<IStateLoadingProps> {
+    public wrapper: React.ReactInstance
+    public wrapperDOM: HTMLElement
+    public classList: string[]
+
+    public componentDidMount() {
       if (this.wrapper) {
         this.wrapperDOM = ReactDOM.findDOMNode(this.wrapper)
         this.mapState()
       }
     }
 
-    componentDidUpdate() {
+    public componentDidUpdate() {
       this.mapState()
     }
 
-    mapState() {
+    public render() {
+      return (
+        <Target
+          ref={inst => {
+            if (inst) {
+              this.wrapper = inst
+            }
+          }}
+          {...this.props}
+        />
+      )
+    }
+
+    public mapState() {
       const { state } = this.props
       const loadingName = 'anticon-spin'
-      const iconSizeClassNames = [
-        'xxs',
-        'xs',
-        'small',
-        'medium',
-        'large',
-        'xl',
-        'xxl',
-        'xxxl'
-      ]
+      const iconSizeClassNames = ['xxs', 'xs', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl']
       this.classList = this.classList || []
+
       if (this.wrapperDOM) {
         const icon = this.wrapperDOM.querySelector('.anticon')
-        if (!icon || !icon.classList) return
+        if (!icon || !icon.classList) {
+          return
+        }
+
         if (state === 'loading') {
           icon.classList.forEach(className => {
             if (className.indexOf('anticon-') > -1) {
@@ -119,19 +139,6 @@ export const StateLoading = Target => {
           this.classList = []
         }
       }
-    }
-
-    render() {
-      return (
-        <Target
-          ref={inst => {
-            if (inst) {
-              this.wrapper = inst
-            }
-          }}
-          {...this.props}
-        />
-      )
     }
   }
 }
@@ -157,7 +164,11 @@ export const mapStyledProps = (props, { loading, size }) => {
   }
 }
 
-export const mapTextComponent = (Target, props, { editable, name }) => {
+export const mapTextComponent = (
+  Target: React.ComponentClass,
+  props,
+  { editable, name }: { editable: boolean | ((name: string) => boolean); name: string }
+): React.ComponentClass => {
   if (editable !== undefined) {
     if (isFn(editable)) {
       if (!editable(name)) {
@@ -188,7 +199,9 @@ export const transformDataSourceKey = (component, dataSourceKey) => {
 }
 
 export const moveTo = element => {
-  if (!element) return
+  if (!element) {
+    return
+  }
   if (element.scrollIntoView) {
     element.scrollIntoView({
       behavior: 'smooth',

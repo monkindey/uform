@@ -476,7 +476,7 @@ registerFieldMiddleware(Field => {
             label: schema.title,
             noMinHeight: schema.type === 'object' && !schema['x-component'],
             isTableColItem: isTableColItem(schemaPath.slice(0, schemaPath.length - 2), getSchema),
-            type: schema['x-component'] || schema['type'],
+            type: schema['x-component'] || schema.type,
             id: name,
             validateState: toArr(errors).length ? 'error' : undefined,
             required: editable === false ? false : required,
