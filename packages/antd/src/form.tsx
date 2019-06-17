@@ -2,28 +2,29 @@ import React from 'react'
 import { registerFormWrapper, registerFieldMiddleware } from '@uform/react'
 import classNames from 'classnames'
 import { Popover, Icon, Row, Col } from 'antd'
-import LOCALE from './locale'
 import styled from 'styled-components'
-import { isFn, moveTo, isStr } from './utils'
+import { ISchema } from '@uform/utils'
 import stringLength from 'string-length'
+
+import LOCALE from './locale'
+import { isFn, moveTo, isStr } from './utils'
+
 /**
  * 轻量级 Form，不包含任何数据管理能力
- *
  */
-
-export const {
-  Provider: FormProvider,
-  Consumer: FormConsumer
-} = React.createContext()
+export const { Provider: FormProvider, Consumer: FormConsumer } = React.createContext(null)
 
 const normalizeCol = col => {
   return typeof col === 'object' ? col : { span: col }
 }
 
 const getParentNode = (node, selector) => {
-  if (!node || (node && !node.matches)) return
-  if (node.matches(selector)) return node
-  else {
+  if (!node || (node && !node.matches)) {
+    return
+  }
+  if (node.matches(selector)) {
+    return node
+  } else {
     return getParentNode(node.parentNode || node.parentElement, selector)
   }
 }
@@ -36,13 +37,128 @@ const isPopDescription = description => {
   }
 }
 
+export interface IFormItemProps {
+  id: string
+  required: boolean
+  label: React.ReactNode
+  prefix: string
+  extra: object
+  // TODO
+  labelAlign: string
+  labelTextAlign: string
+  labelCol: any
+  wrapperCol: any
+  size: string
+  validateState: any
+
+  autoAddColon: boolean
+  isTableColItem: boolean
+  help: React.ReactNode
+  noMinHeight: boolean
+  children: React.ReactElement
+  className: string
+  style: object
+  type: string
+  schema: ISchema
+}
+
 export const FormItem = styled(
-  class FormItem extends React.Component {
-    static defaultProps = {
+  class FormItem extends React.Component<IFormItemProps> {
+    public static defaultProps = {
       prefix: 'ant-'
     }
 
-    getItemLabel() {
+    public render() {
+      const {
+        className,
+        labelAlign,
+        labelTextAlign,
+        style,
+        prefix,
+        wrapperCol,
+        labelCol,
+        size,
+        help,
+        extra,
+        noMinHeight,
+        isTableColItem,
+        validateState,
+        autoAddColon,
+        required,
+        type,
+        schema,
+        ...others
+      } = this.props
+
+      const itemClassName = classNames({
+        [`${prefix}form-item`]: true,
+        [`${prefix}${labelAlign}`]: labelAlign,
+        [`has-${validateState}`]: !!validateState,
+        [`${prefix}${size}`]: !!size,
+        [`${className}`]: !!className,
+        [`field-${type}`]: !!type
+      })
+
+      // 垂直模式并且左对齐才用到
+      const Tag = (wrapperCol || labelCol) && labelAlign !== 'top' ? Row : 'div'
+      const label = labelAlign === 'inset' ? null : this.getItemLabel()
+      return (
+        <Tag {...others} gutter={0} className={itemClassName} style={style}>
+          {label}
+          {this.getItemWrapper()}
+        </Tag>
+      )
+    }
+
+    private renderHelper() {
+      return (
+        <Popover placement={'top'} content={this.props.extra}>
+          <Icon type={'question-circle'} />
+        </Popover>
+      )
+    }
+
+    private getItemWrapper() {
+      const {
+        labelCol,
+        wrapperCol,
+        children,
+        extra,
+        label,
+        labelAlign,
+        help,
+        prefix,
+        noMinHeight,
+        size,
+        isTableColItem
+      } = this.props
+
+      const message = (
+        <div className={`${prefix}form-item-msg ${!noMinHeight ? `${prefix}form-item-space` : ''}`}>
+          {help && <div className={`${prefix}form-item-help`}>{help}</div>}
+          {!help && !isPopDescription(extra) && (
+            <div className={`${prefix}form-item-extra`}>{extra}</div>
+          )}
+        </div>
+      )
+      if ((wrapperCol || labelCol) && labelAlign !== 'top' && !isTableColItem && label) {
+        return (
+          <Col {...normalizeCol(wrapperCol)} className={`${prefix}form-item-control`} key='item'>
+            {React.cloneElement(children, { size })}
+            {message}
+          </Col>
+        )
+      }
+
+      return (
+        <div className={`${prefix}form-item-control`}>
+          {React.cloneElement(children, { size })}
+          {message}
+        </div>
+      )
+    }
+
+    private getItemLabel() {
       const {
         id,
         required,
@@ -93,109 +209,6 @@ export const FormItem = styled(
           {ele}
           {isPopDescription(extra) && this.renderHelper()}
         </div>
-      )
-    }
-
-    getItemWrapper() {
-      const {
-        labelCol,
-        wrapperCol,
-        children,
-        extra,
-        label,
-        labelAlign,
-        help,
-        prefix,
-        noMinHeight,
-        size,
-        isTableColItem
-      } = this.props
-
-      const message = (
-        <div
-          className={`${prefix}form-item-msg ${
-            !noMinHeight ? `${prefix}form-item-space` : ''
-          }`}
-        >
-          {help && <div className={`${prefix}form-item-help`}>{help}</div>}
-          {!help && !isPopDescription(extra) && (
-            <div className={`${prefix}form-item-extra`}>{extra}</div>
-          )}
-        </div>
-      )
-      if (
-        (wrapperCol || labelCol) &&
-        labelAlign !== 'top' &&
-        !isTableColItem &&
-        label
-      ) {
-        return (
-          <Col
-            {...normalizeCol(wrapperCol)}
-            className={`${prefix}form-item-control`}
-            key='item'
-          >
-            {React.cloneElement(children, { size })}
-            {message}
-          </Col>
-        )
-      }
-
-      return (
-        <div className={`${prefix}form-item-control`}>
-          {React.cloneElement(children, { size })}
-          {message}
-        </div>
-      )
-    }
-
-    renderHelper() {
-      return (
-        <Popover closable={false} placement='top' content={this.props.extra}>
-          <Icon type='question-circle' size='small' />
-        </Popover>
-      )
-    }
-
-    render() {
-      const {
-        className,
-        labelAlign,
-        labelTextAlign,
-        style,
-        prefix,
-        wrapperCol,
-        labelCol,
-        size,
-        help,
-        extra,
-        noMinHeight,
-        isTableColItem,
-        validateState,
-        autoAddColon,
-        required,
-        type,
-        schema,
-        ...others
-      } = this.props
-
-      const itemClassName = classNames({
-        [`${prefix}form-item`]: true,
-        [`${prefix}${labelAlign}`]: labelAlign,
-        [`has-${validateState}`]: !!validateState,
-        [`${prefix}${size}`]: !!size,
-        [`${className}`]: !!className,
-        [`field-${type}`]: !!type
-      })
-
-      // 垂直模式并且左对齐才用到
-      const Tag = (wrapperCol || labelCol) && labelAlign !== 'top' ? Row : 'div'
-      const label = labelAlign === 'inset' ? null : this.getItemLabel()
-      return (
-        <Tag {...others} gutter={0} className={itemClassName} style={style}>
-          {label}
-          {this.getItemWrapper()}
-        </Tag>
       )
     }
   }
@@ -265,6 +278,27 @@ export const FormItem = styled(
 `
 
 const toArr = val => (Array.isArray(val) ? val : val ? [val] : [])
+
+export interface IFormProps {
+  className: string
+  inline: boolean
+
+  // TODO
+  size: string
+  labelAlign
+  labelTextAlign
+  layout: string
+  labelCol: object
+  wrapperCol: object
+
+  autoAddColon: boolean
+  children: React.ReactElement
+  component: string
+
+  style: object
+  prefix: string
+  onValidateFailed: () => void
+}
 
 registerFormWrapper(OriginForm => {
   OriginForm = styled(OriginForm)`
@@ -370,8 +404,8 @@ registerFormWrapper(OriginForm => {
     }
   `
 
-  class Form extends React.Component {
-    static defaultProps = {
+  class Form extends React.Component<IFormProps> {
+    public static defaultProps = {
       component: 'form',
       prefix: 'ant-',
       size: 'default',
@@ -381,29 +415,11 @@ registerFormWrapper(OriginForm => {
       autoAddColon: true
     }
 
-    static displayName = 'SchemaForm'
+    public static displayName = 'SchemaForm'
+    public static LOCALE = LOCALE
+    private FormRef = React.createRef()
 
-    FormRef = React.createRef()
-
-    validateFailedHandler(onValidateFailed) {
-      return (...args) => {
-        if (isFn(onValidateFailed)) {
-          onValidateFailed(...args)
-        }
-        const container = this.FormRef.current
-        if (container) {
-          const errors = container.querySelectorAll('.ant-form-item-help')
-          if (errors && errors.length) {
-            const node = getParentNode(errors[0], '.ant-form-item')
-            if (node) {
-              moveTo(node)
-            }
-          }
-        }
-      }
-    }
-
-    render() {
+    public render() {
       const {
         className,
         inline,
@@ -420,6 +436,7 @@ registerFormWrapper(OriginForm => {
         prefix,
         ...others
       } = this.props
+
       const isInline = inline || layout === 'line'
       const formClassName = classNames({
         [`${prefix}form`]: true,
@@ -429,6 +446,7 @@ registerFormWrapper(OriginForm => {
         [`${prefix}form-${labelAlign}`]: !!labelAlign,
         [className]: !!className
       })
+
       return (
         <FormProvider
           value={{
@@ -445,9 +463,7 @@ registerFormWrapper(OriginForm => {
           <OriginForm
             {...others}
             formRef={this.FormRef}
-            onValidateFailed={this.validateFailedHandler(
-              others.onValidateFailed
-            )}
+            onValidateFailed={this.validateFailedHandler(others.onValidateFailed)}
             className={formClassName}
             style={style}
           >
@@ -456,9 +472,25 @@ registerFormWrapper(OriginForm => {
         </FormProvider>
       )
     }
-  }
 
-  Form.LOCALE = LOCALE
+    private validateFailedHandler(onValidateFailed) {
+      return (...args) => {
+        if (isFn(onValidateFailed)) {
+          onValidateFailed(...args)
+        }
+        const container = this.FormRef.current as HTMLElement
+        if (container) {
+          const errors = container.querySelectorAll('.ant-form-item-help')
+          if (errors && errors.length) {
+            const node = getParentNode(errors[0], '.ant-form-item')
+            if (node) {
+              moveTo(node)
+            }
+          }
+        }
+      }
+    }
+  }
 
   return Form
 })
@@ -470,28 +502,14 @@ const isTableColItem = (path, getSchema) => {
 
 registerFieldMiddleware(Field => {
   return props => {
-    const {
-      name,
-      errors,
-      editable,
-      path,
-      required,
-      schema,
-      schemaPath,
-      getSchema
-    } = props
-    if (path.length === 0) return React.createElement(Field, props) // 根节点是不需要包FormItem的
+    const { name, errors, editable, path, required, schema, schemaPath, getSchema } = props
+    if (path.length === 0) {
+      return React.createElement(Field, props) // 根节点是不需要包FormItem的
+    }
     return React.createElement(
       FormConsumer,
       {},
-      ({
-        labelAlign,
-        labelTextAlign,
-        labelCol,
-        wrapperCol,
-        size,
-        autoAddColon
-      }) => {
+      ({ labelAlign, labelTextAlign, labelCol, wrapperCol, size, autoAddColon }) => {
         return React.createElement(
           FormItem,
           {
@@ -504,18 +522,14 @@ registerFieldMiddleware(Field => {
             ...schema['x-item-props'],
             label: schema.title,
             noMinHeight: schema.type === 'object' && !schema['x-component'],
-            isTableColItem: isTableColItem(
-              schemaPath.slice(0, schemaPath.length - 2),
-              getSchema
-            ),
+            isTableColItem: isTableColItem(schemaPath.slice(0, schemaPath.length - 2), getSchema),
             type: schema['x-component'] || schema['type'],
             id: name,
             validateState: toArr(errors).length ? 'error' : undefined,
             required: editable === false ? false : required,
             extra: schema.description,
             help:
-              toArr(errors).join(' , ') ||
-              (schema['x-item-props'] && schema['x-item-props'].help)
+              toArr(errors).join(' , ') || (schema['x-item-props'] && schema['x-item-props'].help)
           },
           React.createElement(Field, props)
         )
