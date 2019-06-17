@@ -16,6 +16,7 @@ import './fields/password'
 import './fields/cards'
 import { mapStyledProps, mapTextComponent } from './utils'
 import { SchemaForm } from '@uform/react'
+
 export * from '@uform/react'
 export * from './components/formButtonGroup'
 export * from './components/button'

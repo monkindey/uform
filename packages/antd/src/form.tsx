@@ -3,11 +3,11 @@ import { registerFormWrapper, registerFieldMiddleware } from '@uform/react'
 import classNames from 'classnames'
 import { Popover, Icon, Row, Col } from 'antd'
 import styled from 'styled-components'
-import { ISchema } from '@uform/utils'
 import stringLength from 'string-length'
 
 import LOCALE from './locale'
 import { isFn, moveTo, isStr } from './utils'
+import { IFormItemProps, IFormProps, LabelAlign } from './type'
 
 /**
  * 轻量级 Form，不包含任何数据管理能力
@@ -35,31 +35,6 @@ const isPopDescription = description => {
   } else {
     return React.isValidElement(description)
   }
-}
-
-export interface IFormItemProps {
-  id: string
-  required: boolean
-  label: React.ReactNode
-  prefix: string
-  extra: object
-  // TODO
-  labelAlign: string
-  labelTextAlign: string
-  labelCol: any
-  wrapperCol: any
-  size: string
-  validateState: any
-
-  autoAddColon: boolean
-  isTableColItem: boolean
-  help: React.ReactNode
-  noMinHeight: boolean
-  children: React.ReactElement
-  className: string
-  style: object
-  type: string
-  schema: ISchema
 }
 
 export const FormItem = styled(
@@ -100,8 +75,8 @@ export const FormItem = styled(
       })
 
       // 垂直模式并且左对齐才用到
-      const Tag = (wrapperCol || labelCol) && labelAlign !== 'top' ? Row : 'div'
-      const label = labelAlign === 'inset' ? null : this.getItemLabel()
+      const Tag = (wrapperCol || labelCol) && labelAlign !== LabelAlign.TOP ? Row : 'div'
+      const label = labelAlign === LabelAlign.INSET ? null : this.getItemLabel()
       return (
         <Tag {...others} gutter={0} className={itemClassName} style={style}>
           {label}
@@ -143,7 +118,7 @@ export const FormItem = styled(
       )
       if ((wrapperCol || labelCol) && labelAlign !== 'top' && !isTableColItem && label) {
         return (
-          <Col {...normalizeCol(wrapperCol)} className={`${prefix}form-item-control`} key='item'>
+          <Col {...normalizeCol(wrapperCol)} className={`${prefix}form-item-control`} key={'item'}>
             {React.cloneElement(children, { size })}
             {message}
           </Col>
@@ -180,8 +155,7 @@ export const FormItem = styled(
       const ele = (
         <label
           htmlFor={id}
-          required={required}
-          key='label'
+          key={'label'}
           className={classNames({
             'no-colon': !autoAddColon
           })}
@@ -278,27 +252,6 @@ export const FormItem = styled(
 `
 
 const toArr = val => (Array.isArray(val) ? val : val ? [val] : [])
-
-export interface IFormProps {
-  className: string
-  inline: boolean
-
-  // TODO
-  size: string
-  labelAlign
-  labelTextAlign
-  layout: string
-  labelCol: object
-  wrapperCol: object
-
-  autoAddColon: boolean
-  children: React.ReactElement
-  component: string
-
-  style: object
-  prefix: string
-  onValidateFailed: () => void
-}
 
 registerFormWrapper(OriginForm => {
   OriginForm = styled(OriginForm)`
@@ -409,9 +362,9 @@ registerFormWrapper(OriginForm => {
       component: 'form',
       prefix: 'ant-',
       size: 'default',
-      labelAlign: 'left',
       layout: 'horizontal',
       locale: LOCALE,
+      labelAlign: LabelAlign.LEFT,
       autoAddColon: true
     }
 
