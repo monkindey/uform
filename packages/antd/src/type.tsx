@@ -29,6 +29,46 @@ export interface IFormConsumerProps {
   labelTextAlign: LabelTextAlign
 }
 
+export interface IRowProps {
+  prefix?: string,
+  pure?: boolean
+  wrap?: boolean,
+  fixed?: boolean,
+  hidden?: boolean,
+  gutter?: string,
+  className?: string,
+
+  // TODO
+  fixedWidth?: string | number,
+  style?: object
+  align?: string | number,
+  justify?: string | number,
+  component?: any,
+  children: React.ReactNode
+}
+
+export interface IColProps {
+  prefix: string
+  pure?: boolean
+  className?: string
+  span?: string | number
+  offset?: string | number
+  fixedSpan?: string | number
+  fixedOffset?: string | number
+  hidden?: boolean
+
+  // TODO
+  align?: any
+  xxs?: any
+  xs?: any
+  s?: any
+  m?: any
+  l?: any
+  xl?: any
+  component?: any
+  children?: React.ReactNode
+}
+
 export interface IFormProps extends IFormConsumerProps {
   className: string
   style: object
