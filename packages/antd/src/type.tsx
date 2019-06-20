@@ -30,20 +30,20 @@ export interface IFormConsumerProps {
 }
 
 export interface IRowProps {
-  prefix?: string,
+  prefix?: string
   pure?: boolean
-  wrap?: boolean,
-  fixed?: boolean,
-  hidden?: boolean,
-  gutter?: string,
-  className?: string,
+  wrap?: boolean
+  fixed?: boolean
+  hidden?: boolean
+  gutter?: string
+  className?: string
 
   // TODO
-  fixedWidth?: string | number,
+  fixedWidth?: string | number
   style?: object
-  align?: string | number,
-  justify?: string | number,
-  component?: any,
+  align?: string | number
+  justify?: string | number
+  component?: any
   children: React.ReactNode
 }
 
@@ -67,6 +67,23 @@ export interface IColProps {
   xl?: any
   component?: any
   children?: React.ReactNode
+}
+
+export interface IFormItemGridProps {
+  name?: string
+  help?: React.ReactNode
+  extra?: React.ReactNode
+  description?: string
+  title?: string
+  cols?: any
+}
+
+export interface IFormCardProps {
+  className?: string
+}
+
+export interface IFormBlockProps {
+  className?: string
 }
 
 export interface IFormProps extends IFormConsumerProps {

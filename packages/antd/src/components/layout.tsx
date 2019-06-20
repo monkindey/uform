@@ -1,59 +1,66 @@
 import React, { Component } from 'react'
-import { createVirtualBox } from '@uform/react'
-import { toArr } from '@uform/utils'
 import { Card, Row, Col } from 'antd'
-import { FormConsumer, FormItem, FormProvider } from '../form'
 import styled from 'styled-components'
 import cls from 'classnames'
+import { createVirtualBox } from '@uform/react'
+import { toArr } from '@uform/utils'
 
-const normalizeCol = (col, _default = 0) => {
-  if (!col) return _default
-  return typeof col === 'object' ? col : { span: col }
+import { FormConsumer, FormItem, FormProvider } from '../form'
+import { IFormItemGridProps, IFormCardProps, IFormBlockProps } from '../type'
+
+const normalizeCol = (
+  col: { span: number; offset?: number } | number,
+  defaultValue: { span: number } = { span: 0 }
+): { span: number; offset?: number } => {
+  if (!col) {
+    return defaultValue
+  } else {
+    return typeof col === 'object' ? col : { span: col }
+  }
 }
 
-export const FormLayout = createVirtualBox(
-  'layout',
-  ({ children, ...props }) => {
-    return (
-      <FormConsumer>
-        {value => {
-          let newValue = { ...value, ...props }
-          let child =
-            newValue.inline || newValue.className || newValue.style ? (
-              <div
-                className={cls(newValue.className, {
-                  'ant-form ant-inline': !!newValue.inline
-                })}
-                style={newValue.style}
-              >
-                {children}
-              </div>
-            ) : (
-              children
-            )
-          return <FormProvider value={newValue}>{child}</FormProvider>
-        }}
-      </FormConsumer>
-    )
-  }
-)
+export const FormLayout = createVirtualBox('layout', ({ children, ...props }) => {
+  return (
+    <FormConsumer>
+      {value => {
+        const newValue = { ...value, ...props }
+        const child =
+          newValue.inline || newValue.className || newValue.style ? (
+            <div
+              className={cls(newValue.className, {
+                'ant-form ant-inline': !!newValue.inline
+              })}
+              style={newValue.style}
+            >
+              {children}
+            </div>
+          ) : (
+            children
+          )
+        return <FormProvider value={newValue}>{child}</FormProvider>
+      }}
+    </FormConsumer>
+  )
+})
 
 export const FormItemGrid = createVirtualBox(
   'grid',
-  class extends Component {
-    renderFormItem(children) {
+  class extends Component<IFormItemGridProps> {
+    public render() {
+      const { title } = this.props
+      if (title) {
+        return this.renderFormItem(this.renderGrid())
+      } else {
+        return this.renderGrid()
+      }
+    }
+
+    private renderFormItem(children) {
       const { title, description, name, help, extra, ...others } = this.props
       return React.createElement(
         FormConsumer,
         {},
-        ({
-          labelAlign,
-          labelTextAlign,
-          labelCol,
-          wrapperCol,
-          size,
-          autoAddColon
-        }) => {
+        ({ labelAlign, labelTextAlign, labelCol, wrapperCol, size, autoAddColon }) => {
           return React.createElement(
             FormItem,
             {
@@ -76,36 +83,36 @@ export const FormItemGrid = createVirtualBox(
       )
     }
 
-    renderGrid() {
-      let {
-        children,
-        cols,
+    private renderGrid() {
+      const {
+        children: rawChildren,
+        cols: rawCols,
         title,
         description,
         help,
         extra,
         ...props
       } = this.props
-      children = toArr(children)
-      cols = toArr(cols).map(col => normalizeCol(col))
+
+      const children = toArr(rawChildren)
       const childNum = children.length
+      const cols = toArr(rawCols).map(col => normalizeCol(col))
 
       if (cols.length < childNum) {
-        let offset = childNum - cols.length
-        let lastSpan =
+        const offset: number = childNum - cols.length
+        const lastSpan: number =
           24 -
           cols.reduce((buf, col) => {
-            return (
-              buf +
-              Number(col.span ? col.span : 0) +
-              Number(col.offset ? col.offset : 0)
-            )
+            return buf + Number(col.span ? col.span : 0) + Number(col.offset ? col.offset : 0)
           }, 0)
+
         for (let i = 0; i < offset; i++) {
-          cols.push(parseInt(lastSpan / offset))
+          cols.push({ span: Math.floor(lastSpan / offset) })
         }
       }
-      cols = toArr(cols).map(col => normalizeCol(col))
+
+      // cols = toArr(cols).map(col => normalizeCol(col))
+
       return (
         <Row {...props}>
           {children.reduce((buf, child, key) => {
@@ -120,26 +127,17 @@ export const FormItemGrid = createVirtualBox(
         </Row>
       )
     }
-
-    render() {
-      const { title } = this.props
-      if (title) {
-        return this.renderFormItem(this.renderGrid())
-      } else {
-        return this.renderGrid()
-      }
-    }
   }
 )
 
 export const FormCard = createVirtualBox(
   'card',
   styled(
-    class extends Component {
-      static defaultProps = {
+    class extends Component<IFormCardProps> {
+      public static defaultProps = {
         // bodyHeight: 'auto'
       }
-      render() {
+      public render() {
         const { children, className, ...props } = this.props
         return (
           <Card className={className} {...props}>
@@ -164,11 +162,12 @@ export const FormCard = createVirtualBox(
 export const FormBlock = createVirtualBox(
   'block',
   styled(
-    class extends Component {
-      static defaultProps = {
+    class extends Component<IFormBlockProps> {
+      public static defaultProps = {
         // bodyHeight: 'auto'
       }
-      render() {
+
+      public render() {
         const { children, className, ...props } = this.props
         return (
           <Card className={className} {...props}>
