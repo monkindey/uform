@@ -136,7 +136,6 @@ export const FormItem = styled(
     private getItemLabel() {
       const {
         id,
-        required,
         label,
         labelCol,
         wrapperCol,

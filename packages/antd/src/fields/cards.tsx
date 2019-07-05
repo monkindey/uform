@@ -1,32 +1,32 @@
 import React, { Fragment } from 'react'
+import styled from 'styled-components'
 import { registerFormField } from '@uform/react'
+import { Card } from 'antd'
 import { toArr } from '@uform/utils'
 import { ArrayField } from './array'
-import { Card } from 'antd'
-import styled from 'styled-components'
 
 const FormCardsField = styled(
   class extends ArrayField {
-    renderOperations(item, index) {
+    public renderOperations(item, index) {
       return (
         <Fragment>
           {this.renderRemove(index, item)}
           {this.renderMoveDown(index, item)}
-          {this.renderMoveUp(index, item)}
+          {this.renderMoveUp(index)}
           {this.renderExtraOperations(index)}
         </Fragment>
       )
     }
 
-    renderEmpty(title) {
+    public renderEmpty = title => {
       return (
-        <Card style={this.getProps('style')} title={title} className='card-list'>
+        <Card style={this.getProps('style')} title={title} className={'card-list'}>
           {super.renderEmpty()}
         </Card>
       )
     }
 
-    render() {
+    public render() {
       const { value, className, schema, renderField } = this.props
       const {
         title,
@@ -37,7 +37,8 @@ const FormCardsField = styled(
         renderMoveUp,
         renderOperations,
         ...others
-      } = this.getProps() || {}
+      } = this.getProps() || ({} as any)
+
       return (
         <div className={className} onClick={this.onClearErrorHandler()}>
           {toArr(value).map((item, index) => {
@@ -49,7 +50,7 @@ const FormCardsField = styled(
                     {index + 1}. {title || schema.title}
                   </span>
                 }
-                className='card-list'
+                className={'card-list'}
                 key={index}
                 extra={this.renderOperations(item, index)}
               >
@@ -58,9 +59,7 @@ const FormCardsField = styled(
             )
           })}
           {value.length === 0 && this.renderEmpty(title)}
-          <div className='addition-wrapper'>
-            {value.length > 0 && this.renderAddition()}
-          </div>
+          <div className={'addition-wrapper'}>{value.length > 0 && this.renderAddition()}</div>
         </div>
       )
     }

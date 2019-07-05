@@ -59,7 +59,7 @@ const StateField = createHOC((options, Field) => {
       }
     }
 
-    public renderField = (key: string, addReactKey: boolean) => {
+    public renderField = (key, addReactKey: boolean) => {
       const path = this.props.path.concat(key)
       const schemaPath = this.props.schemaPath.concat(key)
       const name = path.join('.')

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 import MoveTo from 'moveto'
 import { isFn } from '@uform/utils'
+import { IConnectProps, IFieldProps } from '@uform/react'
 
 export * from '@uform/utils'
 
@@ -155,7 +156,7 @@ export const acceptEnum = component => {
   }
 }
 
-export const mapStyledProps = (props, { loading, size }) => {
+export const mapStyledProps = (props: IConnectProps, { loading, size }: IFieldProps) => {
   if (loading) {
     props.state = props.state || 'loading'
   }
