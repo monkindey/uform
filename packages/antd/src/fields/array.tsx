@@ -46,10 +46,10 @@ export const TextButton = styled.div.attrs({
 export const ArrayField = createArrayField({
   CircleButton,
   TextButton,
-  AddIcon: () => <Icon type={'plus'} />,
-  RemoveIcon: () => <Icon type={'delete'} />,
-  MoveDownIcon: () => <Icon type={'down'} />,
-  MoveUpIcon: () => <Icon type={'up'} />
+  AddIcon: () => <Icon type="plus" />,
+  RemoveIcon: () => <Icon type="delete" />,
+  MoveDownIcon: () => <Icon type="down" />,
+  MoveUpIcon: () => <Icon type="up" />
 })
 
 registerFormField(
@@ -57,18 +57,23 @@ registerFormField(
   styled(
     class extends ArrayField {
       public render() {
-        const { className, name, schema, value, renderField } = this.props
-        const style = (schema['x-props'] && schema['x-props'].style) || {}
+        const { className, name, value, renderField } = this.props
+        const cls = this.getProps('className')
+        const style = this.getProps('style')
         return (
-          <div className={className} style={style} onClick={this.onClearErrorHandler()}>
+          <div
+            className={`${className} ${cls}`}
+            style={style}
+            onClick={this.onClearErrorHandler()}
+          >
             {value.map((item, index) => {
               return (
-                <div className={'array-item'} key={`${name}.${index}`}>
-                  <div className={'array-index'}>
+                <div className="array-item" key={`${name}.${index}`}>
+                  <div className="array-index">
                     <span>{index + 1}</span>
                   </div>
-                  <div className={'array-item-wrapper'}>{renderField(index)}</div>
-                  <div className={'array-item-operator'}>
+                  <div className="array-item-wrapper">{renderField(index)}</div>
+                  <div className="array-item-operator">
                     {this.renderRemove(index, item)}
                     {this.renderMoveDown(index, item)}
                     {this.renderMoveUp(index)}

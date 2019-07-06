@@ -93,6 +93,7 @@ export interface IFormProps extends IFormConsumerProps {
   children: React.ReactNode
   component: string
   prefix: string
+  maxTipsNum: number
   onValidateFailed: () => void
 }
 
@@ -102,6 +103,7 @@ export interface IFormItemProps extends IFormConsumerProps {
   label: React.ReactNode
   prefix: string
   extra: object
+  maxTipsNum: number
 
   // TODO
   validateState: any

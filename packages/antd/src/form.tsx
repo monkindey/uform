@@ -7,11 +7,13 @@ import stringLength from 'string-length'
 
 import LOCALE from './locale'
 import { isFn, moveTo, isStr } from './utils'
-import { IFormItemProps, IFormProps, LabelAlign } from './type'
+import { IFormItemProps, IFormProps } from './type'
 
 /**
  * 轻量级 Form，不包含任何数据管理能力
+ *
  */
+
 export const { Provider: FormProvider, Consumer: FormConsumer } = React.createContext(null)
 
 const normalizeCol = col => {
@@ -29,9 +31,9 @@ const getParentNode = (node, selector) => {
   }
 }
 
-const isPopDescription = description => {
+const isPopDescription = (description, maxTipsNum = 30) => {
   if (isStr(description)) {
-    return stringLength(description) > 20
+    return stringLength(description) > maxTipsNum
   } else {
     return React.isValidElement(description)
   }
@@ -59,6 +61,7 @@ export const FormItem = styled(
         isTableColItem,
         validateState,
         autoAddColon,
+        maxTipsNum,
         required,
         type,
         schema,
@@ -75,8 +78,8 @@ export const FormItem = styled(
       })
 
       // 垂直模式并且左对齐才用到
-      const Tag = (wrapperCol || labelCol) && labelAlign !== LabelAlign.TOP ? Row : 'div'
-      const label = labelAlign === LabelAlign.INSET ? null : this.getItemLabel()
+      const Tag = (wrapperCol || labelCol) && labelAlign !== 'top' ? Row : 'div'
+      const label = labelAlign === 'inset' ? null : this.getItemLabel()
       return (
         <Tag {...others} gutter={0} className={itemClassName} style={style}>
           {label}
@@ -85,57 +88,10 @@ export const FormItem = styled(
       )
     }
 
-    private renderHelper() {
-      return (
-        <Popover placement={'top'} content={this.props.extra}>
-          <Icon type={'question-circle'} />
-        </Popover>
-      )
-    }
-
-    private getItemWrapper() {
-      const {
-        labelCol,
-        wrapperCol,
-        children,
-        extra,
-        label,
-        labelAlign,
-        help,
-        prefix,
-        noMinHeight,
-        size,
-        isTableColItem
-      } = this.props
-
-      const message = (
-        <div className={`${prefix}form-item-msg ${!noMinHeight ? `${prefix}form-item-space` : ''}`}>
-          {help && <div className={`${prefix}form-item-help`}>{help}</div>}
-          {!help && !isPopDescription(extra) && (
-            <div className={`${prefix}form-item-extra`}>{extra}</div>
-          )}
-        </div>
-      )
-      if ((wrapperCol || labelCol) && labelAlign !== 'top' && !isTableColItem && label) {
-        return (
-          <Col {...normalizeCol(wrapperCol)} className={`${prefix}form-item-control`} key={'item'}>
-            {React.cloneElement(children, { size })}
-            {message}
-          </Col>
-        )
-      }
-
-      return (
-        <div className={`${prefix}form-item-control`}>
-          {React.cloneElement(children, { size })}
-          {message}
-        </div>
-      )
-    }
-
     private getItemLabel() {
       const {
         id,
+        required,
         label,
         labelCol,
         wrapperCol,
@@ -144,7 +100,8 @@ export const FormItem = styled(
         labelAlign,
         labelTextAlign,
         autoAddColon,
-        isTableColItem
+        isTableColItem,
+        maxTipsNum
       } = this.props
 
       if (!label || isTableColItem) {
@@ -152,9 +109,11 @@ export const FormItem = styled(
       }
 
       const ele = (
+        // @ts-ignore
         <label
           htmlFor={id}
-          key={'label'}
+          required={required}
+          key="label"
           className={classNames({
             'no-colon': !autoAddColon
           })}
@@ -172,7 +131,7 @@ export const FormItem = styled(
         return (
           <Col {...normalizeCol(labelCol)} className={cls}>
             {ele}
-            {isPopDescription(extra) && this.renderHelper()}
+            {isPopDescription(extra, maxTipsNum) && this.renderHelper()}
           </Col>
         )
       }
@@ -180,15 +139,67 @@ export const FormItem = styled(
       return (
         <div className={cls}>
           {ele}
-          {isPopDescription(extra) && this.renderHelper()}
+          {isPopDescription(extra, maxTipsNum) && this.renderHelper()}
         </div>
+      )
+    }
+
+    private getItemWrapper() {
+      const {
+        labelCol,
+        wrapperCol,
+        children,
+        extra,
+        label,
+        labelAlign,
+        help,
+        prefix,
+        noMinHeight,
+        size,
+        isTableColItem,
+        maxTipsNum
+      } = this.props
+
+      const message = (
+        <div className={`${prefix}form-item-msg ${!noMinHeight ? `${prefix}form-item-space` : ''}`}>
+          {help && <div className={`${prefix}form-item-help`}>{help}</div>}
+          {!help && !isPopDescription(extra, maxTipsNum) && (
+            <div className={`${prefix}form-item-extra`}>{extra}</div>
+          )}
+        </div>
+      )
+      const ele = (
+        <div className={`${prefix}form-item-control`}>
+          {React.cloneElement(children, { size })}
+          {message}
+        </div>
+      )
+      if ((wrapperCol || labelCol) && labelAlign !== 'top' && !isTableColItem && label) {
+        return (
+          <Col {...normalizeCol(wrapperCol)} key="item">
+            {ele}
+          </Col>
+        )
+      }
+
+      return <React.Fragment>{ele}</React.Fragment>
+    }
+
+    private renderHelper() {
+      return (
+        <Popover placement="top" content={this.props.extra}>
+          {/* TODO antd 没有 size 属性 */}
+          <Icon type="question-circle" className={`${this.props.prefix}form-tips`} />
+        </Popover>
       )
     }
   }
 )`
   margin-bottom: 0 !important;
+  .ant-form-item-control-wrapper {
+    line-height: 32px;
+  }
   .ant-form-item-control {
-    display: block;
     line-height: 32px;
   }
   &.field-table {
@@ -201,7 +212,8 @@ export const FormItem = styled(
   }
   .ant-form-item-msg {
     &.ant-form-item-space {
-      min-height: 24px;
+      min-height: 18px;
+      margin-bottom: 2px;
       .ant-form-item-help,
       .ant-form-item-extra {
         margin-top: 0;
@@ -209,13 +221,15 @@ export const FormItem = styled(
       }
     }
   }
+  .ant-form-tips {
+    margin-left: -5px;
+    margin-right: 10px;
+    transform: translateY(1px);
+  }
   .ant-form-item-extra {
     color: #888;
     font-size: 12px;
     line-height: 1.7;
-  }
-  &.ant-form-item.ant-row {
-    display: flex;
   }
   .ant-col {
     padding-right: 0;
@@ -239,23 +253,14 @@ export const FormItem = styled(
       }
     }
   }
-  .ant-left {
-    text-align: left;
-  }
-  .ant-right {
-    text-align: right;
-  }
-  .ant-center {
-    text-align: center;
-  }
 `
 
 const toArr = val => (Array.isArray(val) ? val : val ? [val] : [])
 
 registerFormWrapper(OriginForm => {
   OriginForm = styled(OriginForm)`
-    &.ant-inline,
-    .ant-inline {
+    &.ant-form-inline,
+    .ant-form-inline {
       display: flex;
       .rs-uform-content {
         margin-right: 15px;
@@ -267,6 +272,7 @@ registerFormWrapper(OriginForm => {
       .ant-form-item:not(:last-child) {
         margin-right: 20px;
       }
+
       .ant-form-item.ant-left .ant-form-item-control {
         display: inline-block;
         display: table-cell\0;
@@ -276,28 +282,6 @@ registerFormWrapper(OriginForm => {
     }
     .ant-form-item-label {
       line-height: 32px;
-      padding-right: 12px;
-      text-align: right;
-    }
-    .ant-small {
-      .ant-form-item-label {
-        line-height: 24px;
-      }
-      .ant-radio-group,
-      .ant-checkbox-group {
-        line-height: 24px;
-        min-height: 24px;
-      }
-    }
-    .ant-large {
-      .ant-form-item-label {
-        line-height: 40px;
-      }
-      .ant-radio-group,
-      .ant-checkbox-group {
-        line-height: 40px;
-        min-height: 40px;
-      }
     }
     .ant-form-item-label label[required]:before {
       margin-right: 4px;
@@ -313,46 +297,11 @@ registerFormWrapper(OriginForm => {
     .ant-form-item.has-error .ant-form-item-help {
       color: #ff3000;
     }
-    .ant-radio-group,
-    .ant-checkbox-group {
-      line-height: 32px;
-      & > label {
-        margin-right: 15px;
-      }
-    }
-    .ant-range {
-      margin-top: 10px;
-    }
-    .ant-number-picker-normal {
-      min-width: 62px;
-      width: 100px;
-      .ant-number-picker-input-wrap {
-        width: calc(100% - 22px);
-        .ant-number-picker-input {
-          width: 100%;
-          input {
-            text-align: left;
-            padding: 0 8px;
-          }
-        }
-      }
-    }
+
     .ant-table {
       table {
         table-layout: auto;
       }
-    }
-    .ant-rating-default {
-      min-height: 30px;
-      line-height: 30px;
-    }
-    .ant-rating-small {
-      min-height: 24px;
-      line-height: 24px;
-    }
-    .ant-rating-large {
-      min-height: 40px;
-      line-height: 40px;
     }
   `
 
@@ -361,9 +310,9 @@ registerFormWrapper(OriginForm => {
       component: 'form',
       prefix: 'ant-',
       size: 'default',
+      labelAlign: 'left',
       layout: 'horizontal',
       locale: LOCALE,
-      labelAlign: LabelAlign.LEFT,
       autoAddColon: true
     }
 
@@ -384,6 +333,7 @@ registerFormWrapper(OriginForm => {
         labelCol,
         layout,
         wrapperCol,
+        maxTipsNum,
         style,
         prefix,
         ...others
@@ -392,13 +342,11 @@ registerFormWrapper(OriginForm => {
       const isInline = inline || layout === 'line'
       const formClassName = classNames({
         [`${prefix}form`]: true,
-        [`${prefix}form-${layout}`]: true,
-        [`${prefix}inline`]: isInline, // 内联
+        [`${prefix}form-${isInline ? 'inline' : layout}`]: true,
         [`${prefix}${size}`]: size,
         [`${prefix}form-${labelAlign}`]: !!labelAlign,
         [className]: !!className
       })
-
       return (
         <FormProvider
           value={{
@@ -406,6 +354,7 @@ registerFormWrapper(OriginForm => {
             labelTextAlign,
             labelCol,
             wrapperCol,
+            maxTipsNum,
             inline: isInline,
             size,
             autoAddColon,
@@ -444,6 +393,8 @@ registerFormWrapper(OriginForm => {
     }
   }
 
+  Form.LOCALE = LOCALE
+
   return Form
 })
 
@@ -456,18 +407,20 @@ registerFieldMiddleware(Field => {
   return props => {
     const { name, errors, editable, path, required, schema, schemaPath, getSchema } = props
     if (path.length === 0) {
-      return React.createElement(Field, props) // 根节点是不需要包FormItem的
+      // 根节点是不需要包FormItem的
+      return React.createElement(Field, props)
     }
     return React.createElement(
       FormConsumer,
       {},
-      ({ labelAlign, labelTextAlign, labelCol, wrapperCol, size, autoAddColon }) => {
+      ({ labelAlign, labelTextAlign, labelCol, maxTipsNum, wrapperCol, size, autoAddColon }) => {
         return React.createElement(
           FormItem,
           {
             labelAlign,
             labelTextAlign,
             labelCol,
+            maxTipsNum,
             wrapperCol,
             autoAddColon,
             size,

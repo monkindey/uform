@@ -250,11 +250,23 @@ registerFormField(
       }
 
       public render() {
-        const { value, schema, locale, className, renderField, getOrderProperties } = this.props
-        const style = schema['x-props'] && schema['x-props'].style
-        const operationsWidth = schema['x-props'] && schema['x-props'].operationsWidth
+        const {
+          value,
+          schema,
+          locale,
+          className,
+          renderField,
+          getOrderProperties
+        } = this.props
+        const cls = this.getProps('className')
+        const style = this.getProps('style')
+        const operationsWidth = this.getProps('operationsWidth')
         return (
-          <div className={className} style={style} onClick={this.onClearErrorHandler()}>
+          <div
+            className={`${className} ${cls}`}
+            style={style}
+            onClick={this.onClearErrorHandler()}
+          >
             <div>
               <Table dataSource={value}>
                 {getOrderProperties(schema.items).reduce((buf, { key, schema }) => {
