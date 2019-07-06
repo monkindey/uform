@@ -64,8 +64,6 @@ export class Field implements IField {
 
   public lastValidateValue: any
 
-  private publisher: Broadcast<any, any, any>
-
   private context: Form
 
   private removed: boolean
@@ -76,13 +74,12 @@ export class Field implements IField {
 
   private alreadyHiddenBeforeUnmount: boolean
 
-  // TODO 不知道 fieldbrd 这个有啥用
-  private fieldbrd: any
+  private fieldbrd: Broadcast<any, any, any>
 
   private unSubscribeOnChange: () => void
 
   constructor(context: Form, options: IFieldOptions) {
-    this.publisher = new Broadcast()
+    this.fieldbrd = new Broadcast()
     this.context = context
     this.dirty = false
     this.pristine = true
@@ -286,13 +283,13 @@ export class Field implements IField {
     if (!this.dirty && !force) {
       return
     }
-    this.publisher.notify(this.publishState())
+    this.fieldbrd.notify(this.publishState())
     this.dirty = false
     this.dirtyType = ''
   }
 
   public unsubscribe() {
-    this.publisher.unsubscribe()
+    this.fieldbrd.unsubscribe()
   }
 
   public changeProps(props: any, force?: boolean) {
@@ -545,6 +542,6 @@ export class Field implements IField {
     this.context.updateChildrenVisible(this, false)
     delete this.context
     this.unsubscribe()
-    delete this.publisher
+    delete this.fieldbrd
   }
 }
