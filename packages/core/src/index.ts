@@ -25,7 +25,7 @@ export const createForm = ({
   let fields = []
   let calculatedValues = caculateSchemaInitialValues(
     schema,
-    initialValues,
+    isEmpty(values) ? initialValues : values,
     ({ name, path, schemaPath }, schema, value) => {
       fields.push({ name, path, schemaPath, schema, value })
     }
