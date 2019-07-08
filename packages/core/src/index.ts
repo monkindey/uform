@@ -23,13 +23,20 @@ export const createForm = ({
   onValidateFailed
 }: IFormOptions) => {
   let fields = []
-  initialValues = caculateSchemaInitialValues(
+  let calculatedValues = caculateSchemaInitialValues(
     schema,
     initialValues,
-    ({ name, path, schemaPath }, schema, value: any) => {
+    ({ name, path, schemaPath }, schema, value) => {
       fields.push({ name, path, schemaPath, schema, value })
     }
   )
+
+  if (isEmpty(values)) {
+    initialValues = calculatedValues
+  } else {
+    values = calculatedValues
+  }
+
   const form = new Form({
     initialValues,
     onSubmit,
