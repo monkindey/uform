@@ -7,7 +7,7 @@ export interface ISubmitProps extends Omit<BaseButtonProps, 'loading'> {
   showLoading?: boolean
 }
 
-export interface IFormLayoutProps1 {
+export interface IFormLayoutProps {
   className: string
   inline: boolean
   labelAlign: 'left' | 'top' | 'inset'
@@ -20,7 +20,7 @@ export interface IFormLayoutProps1 {
   render: (fieldProps: IFieldProps) => string | JSX.Element | null
 }
 
-export type TFormLayout = React.FunctionComponent<Partial<IFormLayoutProps1>>
+export type TFormLayout = React.FunctionComponent<Partial<IFormLayoutProps>>
 
 export interface IRowProps {
   prefix?: string
