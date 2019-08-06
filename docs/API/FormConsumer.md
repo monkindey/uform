@@ -1,29 +1,27 @@
 # FormConsumer
 
 ## 介绍
+
 用于表单的跨组件通讯提交重置状态同步等操作，它主要与FormProvider一起使用
 
 ## 依赖
+
 ```javascript
 import {FormConsumer} from '@uform/react'
 ```
 
-
 ## API
 
 ```typescript
-<FormConsumer>
-    {({
-      status  : String<"changed" | "resetd" | "initialize" | "submitting" | "submitted">, //表单活动状态
-      state   : FormState,//表单状态模型
-      schema  : Object,//表单schema
-      submit(),//表单提交
-      reset(),//表单重置
-      dispatch(name : String,payload : any)//触发effect自定义事件 
-    })=>ReactElement)
-</FormConsumer>
+type FormConsumer = React.Consumer<{
+  status  : "changed" | "reseted" | "initialize" | "submitting" | "submitted", //表单活动状态
+  state   : IFormState,//表单状态模型
+  schema  : ISchema,//表单schema
+  submit  : () => void,//表单提交
+  reset   : () => void,//表单重置
+  dispatch: (name: string, payload: any) => void//触发effect自定义事件 
+}>
 ```
-
 
 ## 用例
 

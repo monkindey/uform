@@ -8,26 +8,32 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",
-    "build": "node ./scripts/build.js",
-    "build:docs": "node ./scripts/docs.js build -i docs -o packages/docs",
-    "build:watch": "node ./scripts/build.js --watch",
+    "build": "rm -rf packages/*/lib packages/*/esm && lerna run build",
+    "build:docs": "node ./scripts/docs.js build -i docs -o docs",
     "start": "node ./scripts/docs.js start -i docs",
-    "test": "npm run build && jest",
-    "test:watch": "concurrently \"npm run build:watch\" \"jest --watch\"",
+    "sort-api": "node ./scripts/sort-api-table.js",
+    "test": "jest",
+    "test:prod": "cross-env TEST_ENV=production npm run build && jest",
+    "test:watch": "jest --watch",
     "coverage": "npm run test -- --coverage",
     "coverage:upload": "rm -rf ./coverage && npm run coverage && node ./scripts/mapCoverage.js && codecov",
     "prevesion": "npm run build && npm run lint && npm run test",
-    "version:alpha": "npm run prevesion && lerna version prerelease --preid alpha  --exact --no-git-tag-version",
-    "version:beta": "npm run prevesion && lerna version prerelease --preid beta --exact --no-git-tag-version",
-    "version:rc": "npm run prevesion && lerna version prerelease --preid rc --exact --no-git-tag-version",
-    "version:patch": "npm run prevesion && lerna version patch --exact",
-    "version:minor": "npm run prevesion && lerna version minor --exact",
-    "version:major": "npm run prevesion && lerna version major --exact",
+    "version:alpha": "npm run prevesion && lerna version prerelease --preid alpha --force-publish=* --no-git-tag-version -m \"chore(versions): publish packages %s\"",
+    "version:beta": "npm run prevesion && lerna version prerelease --preid beta --force-publish=* --no-git-tag-version -m \"chore(versions): publish packages %s\"",
+    "version:rc": "npm run prevesion && lerna version prerelease --preid rc --force-publish=* --no-git-tag-version -m \"chore(versions): publish packages %s\"",
+    "version:patch": "npm run prevesion && lerna version patch --force-publish=* --no-git-tag-version -m \"chore(versions): publish packages %s\"",
+    "version:minor": "npm run prevesion && lerna version minor --force-publish=* --no-git-tag-version -m \"chore(versions): publish packages %s\"",
+    "version:major": "npm run prevesion && lerna version major --force-publish=* --no-git-tag-version -m \"chore(versions): publish packages %s\"",
     "release:force": "lerna publish from-package --yes",
     "release": "lerna publish",
-    "lint": "eslint \"packages/!(docs)/**/*.js\" \"scripts/**/*.js\""
+    "lint": "eslint --ext .ts,.tsx,.js \"packages/*/src/**.@(ts|tsx|js)\" \"scripts/**/*.js\" --fix",
+    "postinstall": "opencollective-postinstall"
+  },
+  "resolutions": {
+    "@types/react": "16.8.23"
   },
   "devDependencies": {
+    "@alifd/next": "^1.14.2",
     "@babel/cli": "^7.2.0",
     "@babel/core": "^7.3.3",
     "@babel/plugin-proposal-class-properties": "^7.2.3",
@@ -40,26 +46,32 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.0.0",
     "@babel/runtime-corejs3": "^7.2.0",
+    "@testing-library/react": "^8.0.0",
+    "@types/node": "^12.6.8",
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
     "all-contributors-cli": "^6.1.2",
+    "antd": "^3.17.0",
+    "awesome-typescript-loader": "^5.2.1",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
-    "babel-loader": "^8.0.4",
+    "babel-loader": "^8.0.6",
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "chalk": "^2.4.2",
     "chokidar": "^2.1.2",
     "concurrently": "^4.1.0",
     "conventional-commit-types": "^2.2.0",
+    "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
     "doc-scripts": "^1.7.24",
     "eslint": "^5.16.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-config-standard-react": "^7.0.2",
+    "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-react": "^7.12.4",
-    "eslint-plugin-react-hooks": "^1.0.2",
-    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-react": "^7.14.2",
+    "eslint-plugin-react-hooks": "^1.6.1",
     "execa": "^1.0.0",
     "findup": "^0.1.5",
     "fs-extra": "^7.0.1",
@@ -71,25 +83,54 @@
     "jest-codemods": "^0.19.1",
     "jest-dom": "^3.1.2",
     "jest-localstorage-mock": "^2.3.0",
+    "jest-watch-lerna-packages": "^1.1.0",
     "json5": "^2.1.0",
     "lerna": "^3.10.1",
-    "prettier-eslint-cli": "^4.7.1",
+    "lint-staged": "^8.2.1",
+    "majo": "^0.7.1",
+    "onchange": "^5.2.0",
+    "prettier": "^1.18.2",
     "pretty-format": "^24.0.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-testing-library": "^6.0.0",
+    "remark-parse": "^6.0.3",
+    "remark-stringify": "^6.0.4",
     "semver-regex": "^2.0.0",
     "staged-git-files": "^1.1.2",
+    "ts-import-plugin": "^1.6.1",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
+    "typescript": "^3.5.2",
+    "unified": "^7.1.0",
     "user-event": "^1.4.4",
-    "webpack": "^4.27.1"
+    "webpack": "^4.35.3"
   },
   "config": {
     "ghooks": {
-      "pre-commit": "prettier-eslint \"./(packages|scripts)/**.js\" --write && npm run lint",
+      "pre-commit": "lint-staged",
       "commit-msg": "node ./scripts/validate-commit-msg.js"
     },
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "lint-staged": {
+    "packages/**": [
+      "npm run lint",
+      "git add"
+    ],
+    "scripts/**": [
+      "npm run lint",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "opencollective": "^1.0.3",
+    "opencollective-postinstall": "^2.0.2"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/uform"
   }
 }

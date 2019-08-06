@@ -8,52 +8,68 @@ import SchemaForm, {
   createVirtualBox
 } from '../index'
 import { toArr } from '@uform/utils'
-import { render, fireEvent, act } from 'react-testing-library'
+import { render, fireEvent, act } from '@testing-library/react'
 
 let FormCard
 
-beforeEach(() => {
-  registerFormField(
-    'string',
-    connect()(props => (
-      <input data-testid='input' {...props} value={props.value || ''} />
+registerFormField(
+  'string',
+  connect()(props => (
+    <input data-testid="input" {...props} value={props.value || ''} />
+  ))
+)
+
+registerFormField(
+  'radio',
+  connect()(props =>
+    props.dataSource.map(item => (
+      <label htmlFor={item.value} key={`${item.label}-${item.value}`}>
+        <input
+          onChange={() => props.onChange(item.value)}
+          type="radio"
+          checked={item.value === props.value}
+          id={item.value}
+          data-testid={`radio-${item.value}`}
+        />
+        {props.id}
+      </label>
     ))
   )
+)
 
-  registerFormField('container', props => {
-    const { value, mutators, renderField } = props
-    return (
-      <Fragment>
-        {toArr(value).map((item, index) => {
-          return (
-            <div data-testid='item' key={index}>
-              {renderField(index)}
-              <button
-                type='button'
-                onClick={() => {
-                  mutators.remove(index)
-                }}
-              >
-                Remove Field
-              </button>
-            </div>
-          )
-        })}
-        <button
-          type='button'
-          onClick={() => {
-            mutators.push()
-          }}
-        >
-          Add Field
-        </button>
-      </Fragment>
-    )
-  })
+registerFormField('container', props => {
+  const { value, mutators, renderField } = props
+  return (
+    <Fragment>
+      {toArr(value).map((item, index) => {
+        return (
+          <div data-testid="item" key={index}>
+            {renderField(index)}
+            <button
+              type="button"
+              onClick={() => {
+                mutators.remove(index)
+              }}
+            >
+              Remove Field
+            </button>
+          </div>
+        )
+      })}
+      <button
+        type="button"
+        onClick={() => {
+          mutators.push()
+        }}
+      >
+        Add Field
+      </button>
+    </Fragment>
+  )
+})
 
-  FormCard = createVirtualBox('card', ({ children }) => {
-    return <div>card content{children}</div>
-  })
+FormCard = createVirtualBox('card', ({ children }) => {
+  return <div>card content{children}</div>
 })
 
 test('dynaimc add field', async () => {
@@ -85,10 +101,10 @@ test('dynaimc add field', async () => {
           )
         }}
       >
-        <Field name='container' type='array' x-component='container'>
-          <Field name='object' type='object'>
-            <Field name='aa' type='string' />
-            <Field name='bb' type='string' />
+        <Field name="container" type="array" x-component="container">
+          <Field name="object" type="object">
+            <Field name="aa" type="string" />
+            <Field name="bb" type="string" />
           </Field>
         </Field>
       </SchemaForm>
@@ -162,10 +178,10 @@ test('dynaimc add field with initialValue', async () => {
           )
         }}
       >
-        <Field name='container' type='array' x-component='container'>
-          <Field name='object' type='object'>
-            <Field name='aa' type='string' />
-            <Field name='bb' type='string' />
+        <Field name="container" type="array" x-component="container">
+          <Field name="object" type="object">
+            <Field name="aa" type="string" />
+            <Field name="bb" type="string" />
           </Field>
         </Field>
       </SchemaForm>
@@ -173,7 +189,7 @@ test('dynaimc add field with initialValue', async () => {
   }
 
   const { queryAllByTestId, queryByText } = render(<TestComponent />)
-  await sleep(100)
+  await sleep(33)
   expect(queryAllByTestId('item').length).toBe(1)
   expect(queryAllByTestId('input').length).toBe(1)
   fireEvent.click(queryByText('Add Field'))
@@ -249,21 +265,21 @@ test('dynaimc add field with initialValue in virtualbox', async () => {
           )
         }}
       >
-        <Field name='container' type='array' x-component='container'>
-          <Field name='object' type='object'>
+        <Field name="container" type="array" x-component="container">
+          <Field name="object" type="object">
             <FormCard>
-              <Field name='aa' type='string' />
-              <Field name='bb' type='string' />
+              <Field name="aa" type="string" />
+              <Field name="bb" type="string" />
             </FormCard>
           </Field>
         </Field>
-        <button type='submit'>Submit</button>
+        <button type="submit">Submit</button>
       </SchemaForm>
     )
   }
 
   const { queryAllByTestId, queryByText } = render(<TestComponent />)
-  await sleep(100)
+  await sleep(33)
   expect(queryAllByTestId('item').length).toBe(1)
   expect(queryAllByTestId('input').length).toBe(1)
   fireEvent.click(queryByText('Add Field'))
@@ -295,7 +311,7 @@ test('dynaimc add field with initialValue in virtualbox', async () => {
   expect(queryAllByTestId('item').length).toBe(2)
   expect(queryAllByTestId('input').length).toBe(2)
   fireEvent.click(queryByText('Submit'))
-  await sleep(100)
+  await sleep(33)
   expect(submitHandler).toHaveBeenCalledWith({
     container: [{ aa: '321' }, undefined]
   })
@@ -310,15 +326,15 @@ test('dynamic remove field', async () => {
         onSubmit={submitHandler}
         onValidateFailed={validateFaildHandler}
       >
-        <Field name='container' type='array' x-component='container'>
-          <Field name='object' type='object'>
+        <Field name="container" type="array" x-component="container">
+          <Field name="object" type="object">
             <FormCard>
-              <Field name='aa' required type='string' />
-              <Field name='bb' required type='string' />
+              <Field name="aa" required type="string" />
+              <Field name="bb" required type="string" />
             </FormCard>
           </Field>
         </Field>
-        <button type='submit'>Submit</button>
+        <button type="submit">Submit</button>
       </SchemaForm>
     )
   }
@@ -352,19 +368,19 @@ test('dynamic default value', async () => {
     return (
       <SchemaForm>
         <Field
-          name='container'
-          type='array'
+          name="container"
+          type="array"
           default={[{}]}
-          x-component='container'
+          x-component="container"
         >
-          <Field name='object' type='object'>
+          <Field name="object" type="object">
             <FormCard>
-              <Field name='aa' required type='string' />
-              <Field name='bb' required type='string' />
+              <Field name="aa" required type="string" />
+              <Field name="bb" required type="string" />
             </FormCard>
           </Field>
         </Field>
-        <button type='submit'>Submit</button>
+        <button type="submit">Submit</button>
       </SchemaForm>
     )
   }
@@ -407,12 +423,12 @@ test('dynamic async default value', async () => {
     }, [])
     return (
       <SchemaForm initialValues={{}} schema={schema}>
-        <button type='submit'>Submit</button>
+        <button type="submit">Submit</button>
       </SchemaForm>
     )
   }
   const { queryAllByTestId } = render(<TestComponent />)
-  await sleep(100)
+  await sleep(33)
   expect(queryAllByTestId('item').length).toBe(1)
   expect(queryAllByTestId('input').length).toBe(2)
 })
@@ -450,14 +466,218 @@ test('invalid schema', async () => {
     }, [])
     return (
       <SchemaForm initialValues={{}} schema={schema}>
-        <button type='submit'>Submit</button>
+        <button type="submit">Submit</button>
       </SchemaForm>
     )
   }
   const { queryByText, queryAllByTestId } = render(<TestComponent />)
-  await sleep(100)
+  await sleep(33)
   fireEvent.click(queryByText('Add Field'))
   await sleep(33)
   expect(queryAllByTestId('item').length).toBe(2)
   expect(queryAllByTestId('input').length).toBe(4)
+})
+
+test('dynamic change functions onChange/onReset/onSubmit/onValidateFailed', async () => {
+  const actions = createFormActions()
+  const TestComponent = () => {
+    const [state, setState] = useState({ testA: '123' })
+    const constState = { ...state }
+    useEffect(() => {
+      setTimeout(() => {
+        act(() => setState({ testA: `${Math.random()}` }))
+      }, 10)
+    }, [])
+    return (
+      <Fragment>
+        <SchemaForm
+          actions={actions}
+          defaultValue={constState}
+          onChange={() => {
+            if (constState.testA !== '123') {
+              act(() => setState({ testB: '456' }))
+            }
+          }}
+          onReset={() => {
+            if (constState.testA !== '123') {
+              act(() => setState({ testC: '456' }))
+            }
+          }}
+          onSubmit={() => {
+            if (constState.testA !== '123') {
+              act(() => setState({ testD: '456' }))
+            }
+          }}
+          onValidateFailed={() => {
+            if (constState.testA !== '123') {
+              act(() => setState({ testE: '456' }))
+            }
+          }}
+        >
+          <Field
+            type="radio"
+            enum={[
+              {
+                label: 'a1',
+                value: 'a1'
+              },
+              {
+                label: 'a2',
+                value: 'a2'
+              }
+            ]}
+            name="a"
+          />
+          <Field
+            type="radio"
+            enum={[
+              {
+                label: 'b1',
+                value: 'b1'
+              },
+              {
+                label: 'b2',
+                value: 'b2'
+              }
+            ]}
+            required
+            name="b"
+          />
+          <button type="submit">Submit</button>
+        </SchemaForm>
+        <div>valueB-{constState.testB}</div>
+        <div>valueC-{constState.testC}</div>
+        <div>valueD-{constState.testD}</div>
+        <div>valueE-{constState.testE}</div>
+      </Fragment>
+    )
+  }
+  const { queryByTestId, queryAllByText, queryByText } = render(
+    <TestComponent />
+  )
+  await sleep(33)
+  fireEvent.click(queryByTestId('radio-a2'))
+  await sleep(33)
+  // onChange
+  expect(queryAllByText('valueB-456').length).toBe(1)
+  actions.reset()
+  await sleep(33)
+  // onReset
+  expect(queryAllByText('valueC-456').length).toBe(1)
+  fireEvent.click(queryByText('Submit'))
+  await sleep(33)
+  // onValidateFailed
+  expect(queryAllByText('valueE-456').length).toBe(1)
+  fireEvent.click(queryByTestId('radio-b2'))
+  await sleep(33)
+  fireEvent.click(queryByText('Submit'))
+  await sleep(33)
+  // onSubmit
+  expect(queryAllByText('valueD-456').length).toBe(1)
+})
+
+test('dynamic remove field and relationship needs to be retained', async () => {
+  const TestComponent = () => {
+    return (
+      <SchemaForm
+        initialValues={{
+          container: [{ bb: '123' }, { bb: '123' }]
+        }}
+        effects={($, { setFieldState }) => {
+          $('onFieldChange', 'container.*.bb').subscribe(({ value, name }) => {
+            const siblingName = FormPath.transform(name, /\d+/, $d => {
+              return `container.${$d}.aa`
+            })
+            setFieldState(FormPath.match(siblingName), state => {
+              state.visible = value !== '123'
+            })
+          })
+        }}
+      >
+        <Field name="container" type="array" x-component="container">
+          <Field name="object" type="object">
+            <FormCard>
+              <Field name="aa" required type="string" />
+              <Field name="bb" required type="string" />
+            </FormCard>
+          </Field>
+        </Field>
+        <button type="submit">Submit</button>
+      </SchemaForm>
+    )
+  }
+
+  const { queryAllByTestId, queryByText, queryAllByText } = render(
+    <TestComponent />
+  )
+  expect(queryAllByTestId('input').length).toBe(2)
+  let removes
+  await sleep(33)
+  removes = queryAllByText('Remove Field')
+  fireEvent.click(removes[removes.length - 1])
+  await sleep(33)
+  removes = queryAllByText('Remove Field')
+  fireEvent.click(removes[removes.length - 1])
+  await sleep(33)
+  expect(queryAllByTestId('input').length).toBe(0)
+  await sleep(33)
+  fireEvent.click(queryByText('Add Field'))
+  await sleep(33)
+  fireEvent.click(queryByText('Add Field'))
+  await sleep(33)
+  expect(queryAllByTestId('input').length).toBe(2)
+  expect(queryAllByTestId('input')[0].value).toBe('123')
+  expect(queryAllByTestId('input')[1].value).toBe('123')
+})
+
+test('after deleting a component should not be sync an default value', async () => {
+  const TestComponent = () => {
+    return (
+      <SchemaForm
+        value={{
+          container: [{ bb: '123' }, { bb: '123' }]
+        }}
+        effects={($, { setFieldState }) => {
+          $('onFieldChange', 'container.*.bb').subscribe(({ value, name }) => {
+            const siblingName = FormPath.transform(name, /\d+/, $d => {
+              return `container.${$d}.aa`
+            })
+            setFieldState(FormPath.match(siblingName), state => {
+              state.visible = value === '123'
+            })
+          })
+        }}
+      >
+        <Field name="container" type="array" x-component="container">
+          <Field name="object" type="object">
+            <Field name="aa" required type="string" />
+            <Field name="bb" required type="string" />
+          </Field>
+        </Field>
+        <button type="submit">Submit</button>
+      </SchemaForm>
+    )
+  }
+
+  const { queryAllByTestId, queryByText, queryAllByText } = render(
+    <TestComponent />
+  )
+  expect(queryAllByTestId('input').length).toBe(4)
+  let removes
+  await sleep(33)
+  removes = queryAllByText('Remove Field')
+  fireEvent.click(removes[removes.length - 1])
+  await sleep(33)
+  removes = queryAllByText('Remove Field')
+  fireEvent.click(removes[removes.length - 1])
+  await sleep(33)
+  expect(queryAllByTestId('input').length).toBe(0)
+  await sleep(33)
+  fireEvent.click(queryByText('Add Field'))
+  await sleep(33)
+  fireEvent.click(queryByText('Add Field'))
+  await sleep(33)
+  expect(queryAllByTestId('input').length).toBe(2)
+  expect(queryAllByTestId('input')[0].value).toBe('')
+  expect(queryAllByTestId('input')[1].value).toBe('')
 })

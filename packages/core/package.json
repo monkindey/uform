@@ -1,12 +1,13 @@
 {
   "name": "@uform/core",
-  "version": "0.1.11",
+  "version": "0.3.7",
   "license": "MIT",
   "main": "lib",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alibaba/uform.git"
   },
+  "types": "lib/index.d.ts",
   "bugs": {
     "url": "https://github.com/alibaba/uform/issues"
   },
@@ -14,15 +15,22 @@
   "engines": {
     "npm": ">=3.0.0"
   },
+  "scripts": {
+    "build": "tsc --declaration"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  },
   "peerDependencies": {
-    "@babel/runtime": "^7.4.4"
+    "@babel/runtime": "^7.4.4",
+    "scheduler": ">=0.11.2"
   },
   "dependencies": {
-    "@uform/utils": "0.1.7",
-    "@uform/validator": "0.1.7",
+    "@uform/types": "^0.3.7",
+    "@uform/utils": "^0.3.7",
+    "@uform/validator": "^0.3.7",
     "dot-match": "^0.1.18",
-    "rxjs": "^6.3.3",
-    "scheduler": "^0.11.2"
+    "rxjs": "^6.3.3"
   },
   "publishConfig": {
     "access": "public"

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, createRef } from 'react'
 import cls from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -16,11 +16,13 @@ import isEqual from 'lodash.isequal'
 import AppStyle from './style'
 
 // components
-import FieldList from './components/fields/index'
-import Preview from './components/preview/index'
-import generateGlobalBtnList from './components/globalBtnList/index'
+import {
+  FieldList,
+  Preview,
+  GlobalBtnList,
+  PropsSetting
+} from './components/index'
 
-import PropsSetting from './components/props/propsSetting'
 import { SchemaForm, Field } from './utils/baseForm'
 import defaultGlobalCfgList from './configs/supportGlobalCfgList'
 
@@ -33,6 +35,8 @@ class App extends Component {
       systemError: false,
       accordionList: []
     }
+    this.appRef = createRef(null)
+    this.appHeaderRef = createRef(null)
   }
 
   generateGlobalCfgList = () => {
@@ -62,11 +66,12 @@ class App extends Component {
           this.props.changeGbConfig(value)
         }}
         defaultValue={this.props.gbConfig}
-        labelAlign='left'
-        labelTextAlign='right'
+        labelAlign="left"
+        labelCol={10}
+        labelTextAlign="right"
       >
         {globalCfgList.map(props => (
-          <Field {...props} key={props.name} x-item-props={{ labelCol: 10 }} />
+          <Field {...props} key={props.name} />
         ))}
       </SchemaForm>
     )
@@ -93,7 +98,7 @@ class App extends Component {
       list.unshift({
         title: '全局配置',
         content: this.renderGlobalConfig(),
-        expanded: true
+        expanded: false
       })
     }
     return list
@@ -115,6 +120,17 @@ class App extends Component {
     this.setState({
       accordionList: this.getAccordionList()
     })
+
+    const appDom = this.appRef.current
+    const appHeaderDom = this.appHeaderRef.current
+
+    if (appDom.offsetTop !== 0) {
+      document.querySelector(
+        '.schamaform-content'
+      ).style.height = `${window.innerHeight -
+        appDom.offsetTop -
+        appHeaderDom.offsetHeight}px`
+    }
   }
 
   componentWillUnmount() {
@@ -125,12 +141,12 @@ class App extends Component {
     })
   }
 
-  componentWillReceiveProps(nextProps) {
-    let oldProperties = {}
-    if (this.props.schema && this.props.schema.properties) {
-      oldProperties = this.props.schema.properties
-    }
-    const { schema = {}, globalCfg = {}, initSchema: _initSchema } = nextProps
+  componentDidUpdate(prevProps) {
+    const oldProperties =
+      prevProps.schema && prevProps.schema.properties
+        ? prevProps.schema.properties
+        : {}
+    const { schema = {}, globalCfg = {}, initSchema: _initSchema } = this.props
 
     const { properties = {} } = schema
 
@@ -205,24 +221,23 @@ class App extends Component {
     }
   }
 
-  renderGlobalBtnList() {
-    return generateGlobalBtnList(this.props)
-  }
-
   render() {
     const { initSchemaData, renderEngine } = this.props
     const { Accordion, version: UIVersion } = this.props.UI
 
-    const contentHeight = window.innerHeight - 64
+    const contentHeight = window.innerHeight
 
     return this.state.systemError ? (
       <p>系统发生异常</p>
     ) : (
-      <AppStyle className={cls('schemaform-app', this.props.className)}>
-        <div className='schemaform-header'>
+      <AppStyle
+        ref={this.appRef}
+        className={cls('schemaform-app', this.props.className)}
+      >
+        <div ref={this.appHeaderRef} className="schemaform-header">
           <a
-            href='javascript:;'
-            className='schemaform-back'
+            href="javascript:;"
+            className="schemaform-back"
             onClick={() => {
               this.props.onBackBtnClick()
             }}
@@ -230,30 +245,30 @@ class App extends Component {
             后退
           </a>
           <h1>编辑表单</h1>
-          <div className='schemaform-header-btns'>
-            {this.renderGlobalBtnList()}
+          <div className="schemaform-header-btns">
+            <GlobalBtnList {...this.props} />
           </div>
         </div>
-        <div className='schamaform-content' style={{ height: contentHeight }}>
-          <div className='content-col content-col-left'>
+        <div className="schamaform-content" style={{ height: contentHeight }}>
+          <div className="content-col content-col-left">
             {this.getLayoutTpl()}
             <FieldList
               supportFieldList={this.props.supportFieldList}
               includeFieldListKeyList={this.props.includeFieldListKeyList}
             />
           </div>
-          <div className='content-col content-col-main'>
+          <div className="content-col content-col-main">
             <Preview
               schema={initSchemaData}
               renderEngine={renderEngine}
               UI={this.props.UI}
             />
           </div>
-          <div className='content-col content-col-right'>
+          <div className="content-col content-col-right">
             {UIVersion === '1.x' ? (
               <Accordion
                 dataSource={this.state.accordionList}
-                defaultExpandedKeys={['0', '1']}
+                defaultExpandedKeys={['1']}
               />
             ) : (
               <Accordion
@@ -336,8 +351,7 @@ const mapDispatchToProps = dispatch => ({
   initSchema: data => dispatch(initSchema(data)),
   changeCodeMode: codemode => dispatch(changeCodeMode(codemode)),
   changeComponent: componentId => dispatch(changeComponent(componentId)),
-  editComponent: (id, propsData, containerId) =>
-    dispatch(editComponent(id, propsData, containerId))
+  editComponent: (...args) => dispatch(editComponent(...args))
 })
 
 class StyledAppComp extends React.Component {

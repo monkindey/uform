@@ -1,5 +1,7 @@
 # 表单详情
 
+> 该案例默认不显示数据，用来体现缺省状态，如果想查看有数据的形式，点击加载详情数据按钮即可
+
 #### Demo 示例
 
 ```jsx
@@ -66,6 +68,7 @@ const App = () => {
                 { label: '选项4', value: '4' }
               ]}
               required
+              x-props={{ style: { maxWidth: 300 } }}
               title="Select单选"
               name="select"
             />
@@ -82,7 +85,7 @@ const App = () => {
             ]}
             required
             title="Select多选"
-            x-props={{ multiple: true }}
+            x-props={{ mode: 'multiple', style: { maxWidth: 300 } }}
             name="multiselect"
           />
           <Field

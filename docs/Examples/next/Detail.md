@@ -1,5 +1,7 @@
 # 表单详情
 
+> 该案例默认不显示数据，用来体现缺省状态，如果想查看有数据的形式，点击加载详情数据按钮即可
+
 #### Demo 示例
 
 ```jsx
@@ -29,6 +31,7 @@ const App = () => {
     <Printer>
       <SchemaForm
         actions={actions}
+        onChange={values=>setState(values)}
         initialValues={state.value}
         editable={state.editable}
         labelCol={7}
@@ -181,7 +184,14 @@ const App = () => {
           >
             手动触发校验
           </Button>
-          <Reset />
+          <Reset >值重置</Reset>
+          <Button
+            onClick={() => {
+              actions.reset({validate:false})
+            }}
+          >
+            无错重置
+          </Button>
         </FormButtonGroup>
       </SchemaForm>
     </Printer>

@@ -16,14 +16,14 @@ const Dialog = styled(props => {
       }}
     >
       <div
-        className='close-btn'
+        className="close-btn"
         onClick={() => {
           setVisible(false)
         }}
       >
-        <img src='//img.alicdn.com/tfs/TB1KikcO5rpK1RjSZFhXXXSdXXa-200-200.svg' />
+        <img src="//img.alicdn.com/tfs/TB1KikcO5rpK1RjSZFhXXXSdXXa-200-200.svg" />
       </div>
-      <div className='dialog-content' style={{ overflow: 'auto' }}>
+      <div className="dialog-content" style={{ overflow: 'auto' }}>
         {props.children}
       </div>
     </Modal>
@@ -37,6 +37,8 @@ const Dialog = styled(props => {
   border: 1px solid #eee;
   background: #fff;
   outline: none;
+  box-shadow: 0 0 55px #555;
+  border-radius: 10px;
   .close-btn {
     position: absolute;
     top: 15px;
@@ -88,11 +90,11 @@ const cleanSchema = schema => {
     enum: schema.enum,
     title: schema.title,
     required: schema.required,
-
     properties: Object.keys(schema.properties || {}).reduce((buf, key) => {
+      buf = buf || {}
       buf[key] = cleanSchema(schema.properties[key])
       return buf
-    }, {}),
+    }, undefined),
     items: cleanSchema(schema.items)
   }
 }
@@ -108,9 +110,16 @@ export default class extends React.Component {
     e.preventDefault()
     const schema = await this.actions.getSchema('')
     createAlert(
-      <pre>
-        <code>{printSchema(schema)}</code>
-      </pre>
+      <div>
+        <h1>JSON Schema</h1>
+        <pre>
+          <code>{printSchema(schema)}</code>
+        </pre>
+        <h1>UForm Usage</h1>
+        <pre>
+          <code>{`<SchemaForm schema={${printSchema(schema)}} />`}</code>
+        </pre>
+      </div>
     )
   }
 
@@ -122,10 +131,22 @@ export default class extends React.Component {
     return (
       <div className={className}>
         {React.cloneElement(children, {
-          actions: this.actions
+          actions: this.actions,
+          onSubmit:
+            children.props.onSubmit ||
+            (values => {
+              createAlert(
+                <div>
+                  <h1>Submit Result</h1>
+                  <pre>
+                    <code>{JSON.stringify(values, null, 2)}</code>
+                  </pre>
+                </div>
+              )
+            })
         })}
         <a
-          href=''
+          href=""
           style={{
             fontSize: 12,
             textDecoration: 'none',

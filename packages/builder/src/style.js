@@ -42,7 +42,7 @@ export default styled.div`
       width: 9px;
       height: 17px;
       background: url('${props =>
-    props.theme.backIconUrl}') no-repeat center center;
+        props.theme.backIconUrl}') no-repeat center center;
       background-size: 9px 17px;
     }
     &::after {
@@ -87,7 +87,6 @@ export default styled.div`
     position: relative;
     overflow: hidden;
     padding: 0 340px 0 240px;
-    min-height: 700px;
 
     &::after {
       content: "";

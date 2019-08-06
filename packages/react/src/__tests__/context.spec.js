@@ -7,7 +7,7 @@ import SchemaForm, {
   FormConsumer,
   createFormActions
 } from '../index'
-import { render, fireEvent, act } from 'react-testing-library'
+import { render, fireEvent, act } from '@testing-library/react'
 
 beforeEach(() => {
   registerFormField(
@@ -26,9 +26,9 @@ test('submit by form consumer', async () => {
           await sleep(200)
         }}
       >
-        <Field name='aaa' type='string' />
+        <Field name="aaa" type="string" />
       </SchemaForm>
-      <FormConsumer testingAct={act}>
+      <FormConsumer selector={['submitting', 'submitted']}>
         {({ status, submit }) => {
           if (status === 'submitting') {
             return <div>Submitting</div>
@@ -41,9 +41,11 @@ test('submit by form consumer', async () => {
   )
 
   const { queryByText } = render(<TestComponent />)
-  await sleep(100)
-  fireEvent.click(queryByText('Submit'))
-  await sleep(100)
+  await sleep(33)
+  act(() => {
+    fireEvent.click(queryByText('Submit'))
+  })
+  await sleep(33)
   expect(queryByText('Submitting')).toBeVisible()
   await sleep(300)
   expect(queryByText('Submitting')).toBeNull()

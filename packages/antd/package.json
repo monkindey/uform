@@ -1,9 +1,9 @@
 {
   "name": "@uform/antd",
-  "version": "0.1.11",
+  "version": "0.3.7",
   "license": "MIT",
   "main": "lib",
-  "types": "./index.d.ts",
+  "module": "esm",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alibaba/uform.git"
@@ -15,6 +15,13 @@
   "engines": {
     "npm": ">=3.0.0"
   },
+  "scripts": {
+    "build": "ts-node --project ../../tsconfig.build.json build.ts"
+  },
+  "devDependencies": {
+    "antd": "^3.14.1",
+    "typescript": "^3.5.2"
+  },
   "peerDependencies": {
     "@babel/runtime": "^7.4.4",
     "antd": "^3.14.1",
@@ -22,15 +29,13 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@uform/react": "0.1.11",
-    "@uform/utils": "0.1.7",
+    "@uform/types": "^0.3.7",
+    "@uform/react": "^0.3.7",
+    "@uform/utils": "^0.3.7",
     "classnames": "^2.2.6",
     "moveto": "^1.7.4",
     "react-stikky": "^0.1.15",
     "styled-components": "^4.1.1"
-  },
-  "devDependencies": {
-    "antd": "^3.14.1"
   },
   "publishConfig": {
     "access": "public"

@@ -1,23 +1,27 @@
 # setValidationLocale
 
 ## 介绍
+
 设置正则校验规则的国际化文案
 
 ## 类型描述
+
 ```typescript
-type setValidationLocale({
-   [isoCode : String]:{
-      [patternName : String]:message : String
-   }
-})
+interface Locale {
+  [isoCode: string]: string
+}
+
+type setValidationLocale = (locale: Locale) => void
 ```
 
 ## 依赖
+
 ```javascript
-import {setValidationLocale} from '@alife/uform'
+import {setValidationLocale} from '@uform/core'
 ```
 
 ## 默认配置
+
 ```json
 {
   en:{

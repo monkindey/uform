@@ -1,9 +1,8 @@
 {
   "name": "@uform/react",
-  "version": "0.1.11",
+  "version": "0.3.7",
   "license": "MIT",
   "main": "lib",
-  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alibaba/uform.git"
@@ -15,15 +14,23 @@
   "engines": {
     "npm": ">=3.0.0"
   },
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc --declaration"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  },
   "peerDependencies": {
     "@babel/runtime": "^7.4.4",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@uform/core": "0.1.11",
-    "@uform/utils": "0.1.7",
-    "@uform/validator": "0.1.7",
+    "@uform/core": "^0.3.7",
+    "@uform/types": "^0.3.7",
+    "@uform/utils": "^0.3.7",
+    "@uform/validator": "^0.3.7",
     "pascal-case": "^2.0.1",
     "react-eva": "^1.0.0",
     "rxjs-compat": "^6.5.1"
