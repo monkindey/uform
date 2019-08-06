@@ -85,7 +85,7 @@
     "jest-localstorage-mock": "^2.3.0",
     "jest-watch-lerna-packages": "^1.1.0",
     "json5": "^2.1.0",
-    "lerna": "^3.10.1",
+    "lerna": "3.13.4",
     "lint-staged": "^8.2.1",
     "majo": "^0.7.1",
     "onchange": "^5.2.0",
