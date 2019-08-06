@@ -15,7 +15,7 @@ export interface IFormLayoutProps {
   labelCol: number
   labelTextAlign: 'left' | 'right'
   size: 'small' | 'medium' | 'large'
-  style: React.CSSProperties
+  style: object
   name: string
   render: (fieldProps: IFieldProps) => string | JSX.Element | null
 }
@@ -30,7 +30,7 @@ export interface IRowProps {
   hidden?: boolean
   className?: string
   fixedWidth?: string | number
-  style?: React.CSSProperties
+  style?: object
   component?: keyof JSX.IntrinsicElements | React.ComponentType<any>
   gutter?: string
   align?: string | number
